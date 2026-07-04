@@ -1,0 +1,19 @@
+name: decode-og
+on:
+  push:
+    paths: ['og.jpg.b64']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: base64 -d og.jpg.b64 > og.jpg
+      - run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add og.jpg
+          git commit -m "Decode og.jpg" || exit 0
+          git push
