@@ -36,11 +36,26 @@ reps = [
       makeThumb(file);
     }
     proceed();"""),
+("""    xhr.timeout = 180000;
+    xhr.upload.onprogress = function (ev) {
+      if (ev.lengthComputable) $(u.bar).style.width = Math.max(4, Math.round(100 * ev.loaded / ev.total)) + '%';
+    };
+    var finish = function (ok) {""",
+"""    xhr.timeout = 180000;
+    // Do NOT attach any listener to xhr.upload: doing so makes this a
+    // non-simple CORS request, which triggers a preflight OPTIONS that Apps
+    // Script cannot answer, silently blocking the whole upload. Instead show an
+    // indeterminate bar that eases toward 90% while the POST is in flight.
+    setTimeout(function () {
+      $(u.bar).style.transition = 'width 10s ease-out';
+      $(u.bar).style.width = '90%';
+    }, 30);
+    var finish = function (ok) {
+      $(u.bar).style.transition = 'width .2s';"""),
 ]
 n = 0
 for old, new in reps:
     if old in src:
-        src = src.replace(old, new, 1)
-        n += 1
+        src = src.replace(old, new, 1); n += 1
 open(p, 'w').write(src)
-print('applied', n, 'of', len(reps), 'patches')
+print('applied', n, 'of', len(reps))
