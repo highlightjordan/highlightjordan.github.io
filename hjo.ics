@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//DMS Group//Highlight Jordan 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:highlightjordan2026@highlightjordan.github.io
+DTSTAMP:20260704T090000Z
+DTSTART;TZID=Asia/Amman:20260729T100000
+DTEND;TZID=Asia/Amman:20260729T180000
+SUMMARY:Highlight Jordan - Summit & Awards 2026
+DESCRIPTION:Summit sessions 10 AM - 6 PM\, followed in the evening by the Awards Ceremony. Speaker arrival & registration from 9:00 AM.
+LOCATION:Kempinski Hotel Ishtar\, Dead Sea\, Jordan
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Highlight Jordan is tomorrow
+END:VALARM
+END:VEVENT
+END:VCALENDAR
