@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Highlight Jordan &#183; Command Center</title>
+<style>
+  :root {
+    --ink: #0E0E0D; --cream: #FAF7F2; --dim: #9a968e; --teal: #5FD4DD; --coral: #ED5D42; --gold: #C29957;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink); color: var(--cream);
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    min-height: 100dvh; display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 40px;
+  }
+  h1 { font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--teal); margin: 8px 0 4px; text-align: center; }
+  .sub { font-size: 0.7rem; color: var(--dim); letter-spacing: 0.12em; margin-bottom: 22px; text-align: center; }
+  .panel { width: 100%; max-width: 460px; text-align: center; }
+  input {
+    width: 100%; padding: 15px; font-size: 1.1rem; text-align: center;
+    background: #1b1b19; color: var(--cream);
+    border: 1px solid rgba(95,212,221,0.4); outline: none; letter-spacing: 0.2em;
+  }
+  button {
+    width: 100%; padding: 15px; margin-top: 12px; font-size: 0.85rem;
+    letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600;
+    background: var(--teal); color: #0E0E0D; border: none; cursor: pointer;
+  }
+  .hint { font-size: 0.72rem; color: var(--dim); margin-top: 14px; line-height: 1.6; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+  .tile {
+    background: #1b1b19; border: 1px solid rgba(95,212,221,0.25); padding: 14px 16px;
+  }
+  .tile.hero { grid-column: 1 / -1; border-color: rgba(237,93,66,0.7); }
+  .tile .label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
+  .tile .value { font-size: 1.9rem; font-weight: 700; color: var(--teal); margin-top: 4px; }
+  .tile.hero .value { font-size: 2.6rem; color: var(--coral); }
+  .section { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin: 26px 0 10px; text-align: left; }
+  .arrival {
+    display: flex; justify-content: space-between; align-items: baseline;
+    background: #1b1b19; border: 1px solid rgba(95,212,221,0.25);
+    padding: 11px 16px; margin-top: 6px; text-align: left; gap: 12px;
+  }
+  .arrival .aName { font-size: 0.95rem; font-weight: 600; }
+  .arrival .aTime { font-size: 0.72rem; color: var(--dim); letter-spacing: 0.06em; text-align: right; }
+  #status { font-size: 0.68rem; color: var(--dim); margin-top: 20px; letter-spacing: 0.15em; }
+  #board { display: none; }
+  .err { color: #c98080; }
+</style>
+</head>
+<body>
+  <h1>Highlight Jordan &#183; Command Center</h1>
+  <p class="sub">WEDNESDAY, JULY 29, 2026 &#183; 10 AM &#8211; 6 PM &#183; KEMPINSKI ISHTAR, DEAD SEA</p>
+
+  <div class="panel" id="gate">
+    <input id="key" type="tel" placeholder="HOST KEY" autocomplete="off">
+    <button onclick="unlock()">Enter</button>
+    <p class="hint">Private page for the event host.</p>
+  </div>
+
+  <div class="panel" id="board">
+    <div class="grid">
+      <div class="tile hero"><p class="label">Speaker Profiles Complete</p><p class="value" id="vComplete">&#8211;</p></div>
+      <div class="tile"><p class="label">Total Speakers</p><p class="value" id="vTotal">&#8211;</p></div>
+      <div class="tile"><p class="label">Arrived (Event Day)</p><p class="value" id="vArrived">&#8211;</p></div>
+      <div class="tile"><p class="label">Regional / Jordan</p><p class="value" id="vTracks">&#8211;</p></div>
+      <div class="tile"><p class="label">In Progress</p><p class="value" id="vProgress">&#8211;</p></div>
+      <div class="tile"><p class="label">Never Opened Link</p><p class="value" id="vNotOpened">&#8211;</p></div>
+      <div class="tile"><p class="label">Photos Received</p><p class="value" id="vPhotos">&#8211;</p></div>
+      <div class="tile"><p class="label">Passports Missing</p><p class="value" id="vPassMissing">&#8211;</p></div>
+      <div class="tile"><p class="label">Companions</p><p class="value" id="vCompanions">&#8211;</p></div>
+    </div>
+    <p class="section">Latest Activity</p>
+    <div id="arrivals"><p class="hint">No activity recorded yet.</p></div>
+    <button onclick="refresh()">Refresh Now</button>
+    <p id="status"></p>
+  </div>
+
+<script>
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-06us5XpkpPtmqSFmkwDvV1tnh68slpDkQ7SLPA2UZjKIS_emSmp3VHEIAI3yfV9f/exec';
+  var hostKey = '';
+  var timer = null;
+
+  try { hostKey = localStorage.getItem('hjo_host_key') || ''; } catch (e) {}
+  if (hostKey) { openBoard(); }
+
+  function unlock() {
+    hostKey = document.getElementById('key').value.trim();
+    if (!hostKey) return;
+    try { localStorage.setItem('hjo_host_key', hostKey); } catch (e) {}
+    openBoard();
+  }
+
+  function openBoard() {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('board').style.display = 'block';
+    refresh();
+    if (timer) clearInterval(timer);
+    timer = setInterval(refresh, 30000);
+  }
+
+  function refresh() {
+    setStatus('Updating...', false);
+    fetch(SCRIPT_URL + '?stats=1&key=' + encodeURIComponent(hostKey))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.error === 'unauthorized') {
+          try { localStorage.removeItem('hjo_host_key'); } catch (e) {}
+          if (timer) clearInterval(timer);
+          document.getElementById('board').style.display = 'none';
+          document.getElementById('gate').style.display = 'block';
+          return;
+        }
+        if (!d || !d.ok || !d.counts) { setStatus('Could not update. Will retry.', true); return; }
+        var c = d.counts;
+        put('vComplete', c.complete);
+        put('vTotal', c.total);
+        put('vArrived', c.arrived);
+        document.getElementById('vTracks').textContent =
+          (typeof c.regional === 'number' ? c.regional : '-') + ' / ' +
+          (typeof c.jordan === 'number' ? c.jordan : '-');
+        put('vProgress', c.inProgress);
+        put('vNotOpened', c.notOpened);
+        put('vPhotos', c.photos);
+        put('vPassMissing', c.passportsMissing);
+        put('vCompanions', c.companions);
+        var box = document.getElementById('arrivals');
+        box.innerHTML = '';
+        if (d.recent && d.recent.length) {
+          for (var i = 0; i < d.recent.length; i++) {
+            var row = document.createElement('div');
+            row.className = 'arrival';
+            var nm = document.createElement('span');
+            nm.className = 'aName';
+            nm.textContent = d.recent[i].name;
+            var tm = document.createElement('span');
+            tm.className = 'aTime';
+            tm.textContent = d.recent[i].at;
+            row.appendChild(nm); row.appendChild(tm);
+            box.appendChild(row);
+          }
+        } else {
+          box.innerHTML = '<p class="hint">No activity recorded yet.</p>';
+        }
+        var now = new Date();
+        setStatus('UPDATED ' + two(now.getHours()) + ':' + two(now.getMinutes()) + ':' + two(now.getSeconds()) + ' \u00B7 AUTO-REFRESH 30S', false);
+      })
+      .catch(function () {
+        setStatus('Connection issue. Will retry.', true);
+      });
+  }
+
+  function put(id, v) {
+    document.getElementById(id).textContent = (typeof v === 'number') ? String(v) : '-';
+  }
+
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+
+  function setStatus(msg, isErr) {
+    var s = document.getElementById('status');
+    s.textContent = msg;
+    s.className = isErr ? 'err' : '';
+  }
+</script>
+</body>
+</html>
