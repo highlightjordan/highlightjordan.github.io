@@ -52,6 +52,16 @@ reps = [
     }, 30);
     var finish = function (ok) {
       $(u.bar).style.transition = 'width .2s';"""),
+("  var firstName = linkName.split(' ')[0] || 'Speaker';",
+"  var firstName = linkName.trim() || 'Speaker';"),
+("""    if (j.name) {
+      firstName = j.name.split(' ')[0];
+      $('r-name').textContent = firstName;
+    }""",
+"""    if (j.name) {
+      firstName = String(j.name).trim();
+      $('r-name').textContent = firstName;
+    }"""),
 ]
 n = 0
 for old, new in reps:
