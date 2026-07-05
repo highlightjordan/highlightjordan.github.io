@@ -480,7 +480,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     token = (parts[0] || '').trim().toLowerCase();
     linkName = (parts[1] || '').trim();
   }
-  var firstName = linkName.split(' ')[0] || 'Speaker';
+  var firstName = linkName.trim() || 'Speaker';
 
   var S = { info: null, submitted: false };
   var LS_KEY = 'hjo_' + token;
@@ -541,7 +541,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function hydrate() {
     var j = S.info;
     if (j.name) {
-      firstName = j.name.split(' ')[0];
+      firstName = String(j.name).trim();
       $('r-name').textContent = firstName;
     }
     if (j.deadline) { $('r-deadline').textContent = j.deadline; $('h-deadline').textContent = j.deadline; }
